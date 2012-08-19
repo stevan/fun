@@ -32,4 +32,17 @@ is(bar(7), "ran sub, got 19");
     like($warning, qr/Use of uninitialized value \$baz in addition \(\+\)/);
 }
 
+fun baz ($a, $b = our $FOO) {
+    return "$a $b";
+}
+
+{
+    no warnings 'misc'; # 'not imported' warning because we use $FOO later
+    eval '$FOO';
+    like($@, qr/Global symbol "\$FOO" requires explicit package name/, "doesn't leak scope");
+}
+
+our $FOO = "abc";
+is(baz("123"), "123 abc");
+
 done_testing;
