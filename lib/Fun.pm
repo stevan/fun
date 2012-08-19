@@ -28,9 +28,15 @@ our @EXPORT = our @EXPORT_OK = ('fun');
 
 sub fun {
     my ($name, $code) = @_;
-    my $caller = caller;
-    no strict 'refs';
-    *{ $caller . '::' . $name } = $code;
+
+    if (defined $name) {
+        my $caller = caller;
+        no strict 'refs';
+        *{ $caller . '::' . $name } = $code;
+    }
+    else {
+        return $code;
+    }
 }
 
 =head1 BUGS

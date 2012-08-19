@@ -183,14 +183,14 @@ static OP *parse_fun(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
 {
     I32 floor;
     SV *function_name = NULL;
-    OP *arg_assign = NULL, *block, *code;
-
-    *flagsp |= CALLPARSER_STATEMENT;
+    OP *arg_assign = NULL, *block, *code, *name;
 
     floor = start_subparse(0, CVf_ANON);
 
     lex_read_space(0);
-    function_name = parse_idword("");
+    if (isIDFIRST(*(PL_parser->bufptr))) {
+        function_name = parse_idword("");
+    }
 
     lex_read_space(0);
     if (lex_peek_unichar(0) == '(') {
@@ -209,10 +209,16 @@ static OP *parse_fun(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
 
     code = newANONSUB(floor, NULL, block);
 
-    SvREFCNT_inc(function_name);
-    return newLISTOP(OP_LIST, 0,
-                     newSVOP(OP_CONST, 0, function_name),
-                     code);
+    if (function_name) {
+        SvREFCNT_inc(function_name);
+        name = newSVOP(OP_CONST, 0, function_name);
+        *flagsp |= CALLPARSER_STATEMENT;
+    }
+    else {
+        name = newOP(OP_UNDEF, 0);
+    }
+
+    return newLISTOP(OP_LIST, 0, name, code);
 }
 
 
