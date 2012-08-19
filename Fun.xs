@@ -248,8 +248,18 @@ static OP *parse_fun(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
     floor = start_subparse(0, CVf_ANON);
 
     lex_read_space(0);
-    if (isIDFIRST(*(PL_parser->bufptr))) {
-        function_name = parse_idword("");
+    if (isIDFIRST(*(PL_parser->bufptr)) || *(PL_parser->bufptr) == ':') {
+        function_name = sv_2mortal(newSVpvs(""));
+        while (isIDFIRST(*(PL_parser->bufptr)) || *(PL_parser->bufptr) == ':') {
+            if (lex_peek_unichar(0) == ':') {
+                demand_unichar(':', DEMAND_IMMEDIATE);
+                demand_unichar(':', DEMAND_IMMEDIATE);
+                sv_catpvs(function_name, "::");
+            }
+            else {
+                sv_catsv(function_name, parse_idword(""));
+            }
+        }
     }
 
     lex_read_space(0);
