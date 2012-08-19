@@ -59,14 +59,6 @@ sub fun {
     return $code;
 }
 
-sub _install_fun {
-    my ($name, $code) = @_;
-
-    my $caller = caller;
-    no strict 'refs';
-    *{ $caller . '::' . $name } = $code;
-}
-
 =head1 BUGS
 
 No known bugs.

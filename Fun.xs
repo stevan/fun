@@ -275,19 +275,6 @@ static OP *parse_fun(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
         name = newSVOP(OP_CONST, 0, function_name);
         code = newRV_inc((SV*)newATTRSUB(floor, name, NULL, NULL, block));
 
-        ENTER;
-        {
-            dSP;
-            PUSHMARK(SP);
-            EXTEND(SP, 2);
-            PUSHs(function_name);
-            PUSHs(code);
-            PUTBACK;
-            call_pv("Fun::_install_fun", G_VOID);
-            PUTBACK;
-        }
-        LEAVE;
-
         return newOP(OP_NULL, 0);
     }
     else {
