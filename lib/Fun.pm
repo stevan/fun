@@ -16,13 +16,41 @@ our @EXPORT = our @EXPORT_OK = ('fun');
 
 =head1 SYNOPSIS
 
+  use Fun;
+
+  fun float_eq ($a, $b, $e = 0.0001) {
+      return abs($a - $b) < $e;
+  }
+
 =head1 DESCRIPTION
+
+This mdoule provides C<fun>, a new keyword which defines functions the same way
+that C<sub> does, except allowing for function signatures. These signatures
+support defaults and slurpy arguments, but no other advanced features. The
+behavior should be equivalent to taking the signature, stripping out the
+defaults, and injecting C<< my <sig> = @_ >> at the start of the function, and
+then applying defaults as appropriate.
 
 =cut
 
 =head1 EXPORTS
 
 =head2 fun
+
+Behaves identically to C<sub>, except that it does not support prototypes or
+attributes, but it does support a simple function signature. This signature
+consists of a comma separated list of variables, each variable optionally
+followed by C<=> and an expression to use for a default. For instance:
+
+  fun foo ($x, $y = 5) {
+      ...
+  }
+
+Defaults are evaluated every time the function is called, so global variable
+access and things of that sort should work correctly.
+
+C<fun> supports creating both named and anonymous functions, just as C<sub>
+does.
 
 =cut
 
