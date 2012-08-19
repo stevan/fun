@@ -27,16 +27,16 @@ our @EXPORT = our @EXPORT_OK = ('fun');
 =cut
 
 sub fun {
+    my ($code) = @_;
+    return $code;
+}
+
+sub _install_fun {
     my ($name, $code) = @_;
 
-    if (defined $name) {
-        my $caller = caller;
-        no strict 'refs';
-        *{ $caller . '::' . $name } = $code;
-    }
-    else {
-        return $code;
-    }
+    my $caller = caller;
+    no strict 'refs';
+    *{ $caller . '::' . $name } = $code;
 }
 
 =head1 BUGS

@@ -183,7 +183,8 @@ static OP *parse_fun(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
 {
     I32 floor;
     SV *function_name = NULL;
-    OP *arg_assign = NULL, *block, *code, *name;
+    CV *code;
+    OP *arg_assign = NULL, *block, *name;
 
     floor = start_subparse(0, CVf_ANON);
 
@@ -207,18 +208,36 @@ static OP *parse_fun(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
 	                        block);
     }
 
-    code = newANONSUB(floor, NULL, block);
-
     if (function_name) {
+        SV *code;
+
+        *flagsp |= CALLPARSER_STATEMENT;
         SvREFCNT_inc(function_name);
         name = newSVOP(OP_CONST, 0, function_name);
-        *flagsp |= CALLPARSER_STATEMENT;
+        code = newRV_inc((SV*)newATTRSUB(floor, name, NULL, NULL, block));
+
+        ENTER;
+        {
+            dSP;
+            PUSHMARK(SP);
+            EXTEND(SP, 2);
+            PUSHs(function_name);
+            PUSHs(code);
+            PUTBACK;
+            call_pv("Fun::_install_fun", G_VOID);
+            PUTBACK;
+        }
+        LEAVE;
+
+        return newOP(OP_NULL, 0);
     }
     else {
-        name = newOP(OP_UNDEF, 0);
-    }
+        OP *code;
 
-    return newLISTOP(OP_LIST, 0, name, code);
+        code = newANONSUB(floor, NULL, block);
+
+        return newLISTOP(OP_LIST, 0, code, NULL);
+    }
 }
 
 
