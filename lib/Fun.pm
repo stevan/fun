@@ -24,7 +24,7 @@ our @EXPORT = our @EXPORT_OK = ('fun');
 
 =head1 DESCRIPTION
 
-This mdoule provides C<fun>, a new keyword which defines functions the same way
+This module provides C<fun>, a new keyword which defines functions the same way
 that C<sub> does, except allowing for function signatures. These signatures
 support defaults and slurpy arguments, but no other advanced features. The
 behavior should be equivalent to taking the signature, stripping out the
