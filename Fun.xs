@@ -296,6 +296,20 @@ static OP *parse_fun(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
     }
 }
 
+static OP *check_fun(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
+{
+    OP *kids, *args;
+
+    kids = cUNOPx(entersubop)->op_first;
+    args = cLISTOPx(kids)->op_first->op_sibling;
+    if (args->op_type == OP_NULL) {
+        op_free(entersubop);
+        return newOP(OP_NULL, 0);
+    }
+    else {
+        return entersubop;
+    }
+}
 
 MODULE = Fun  PACKAGE = Fun
 
@@ -304,4 +318,5 @@ PROTOTYPES: DISABLE
 BOOT:
 {
     cv_set_call_parser(get_cv("Fun::fun", 0), parse_fun, &PL_sv_undef);
+    cv_set_call_checker(get_cv("Fun::fun", 0), check_fun, &PL_sv_undef);
 }
