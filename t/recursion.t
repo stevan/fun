@@ -24,4 +24,13 @@ is(fact(5), 120);
 
 is(fun ($n = 8) { $n < 2 ? 1 : $n * __SUB__->($n - 1) }->(), 40320);
 
+fun fact2 ($n) {
+    if ($n < 2) {
+        return 1;
+    }
+    return $n * fact2($n - 1);
+}
+
+is(fact2(5), 120);
+
 done_testing;
