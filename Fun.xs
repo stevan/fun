@@ -133,13 +133,13 @@ static OP *THX_parse_parameter_default(pTHX_ IV i, PADOFFSET padoffset)
     name = newSVsv(*av_fetch(PL_comppad_name, padoffset, 0));
     sigil = SvPVX(name)[0];
     if (sigil == '$') {
-        get_var = newOP(OP_PADSV, (OPpLVAL_INTRO<<8)|OPf_WANT_LIST);
+        get_var = newOP(OP_PADSV, 0);
     }
     else if (sigil == '@') {
-        get_var = newOP(OP_PADAV, (OPpLVAL_INTRO<<8)|OPf_WANT_LIST);
+        get_var = newOP(OP_PADAV, 0);
     }
     else if (sigil == '%') {
-        get_var = newOP(OP_PADHV, (OPpLVAL_INTRO<<8)|OPf_WANT_LIST);
+        get_var = newOP(OP_PADHV, 0);
     }
     else {
         croak("weird pad entry %"SVf, name);
@@ -165,8 +165,6 @@ static OP *THX_parse_function_prototype(pTHX)
     }
 
     myvars = newLISTOP(OP_LIST, 0, NULL, NULL);
-    myvars->op_private |= OPpLVAL_INTRO;
-
     defaults = newLISTOP(OP_LINESEQ, 0, NULL, NULL);
 
     for (;;) {
@@ -178,17 +176,17 @@ static OP *THX_parse_function_prototype(pTHX)
         lex_read_space(0);
         next = lex_peek_unichar(0);
         if (next == '$') {
-            pad_op = newOP(OP_PADSV, (OPpLVAL_INTRO<<8)|OPf_WANT_LIST);
+            pad_op = newOP(OP_PADSV, 0);
             name = parse_scalar_varname();
             pad_op->op_targ = pad_add_my_scalar_sv(name);
         }
         else if (next == '@') {
-            pad_op = newOP(OP_PADAV, (OPpLVAL_INTRO<<8)|OPf_WANT_LIST);
+            pad_op = newOP(OP_PADAV, 0);
             name = parse_array_varname();
             pad_op->op_targ = pad_add_my_array_sv(name);
         }
         else if (next == '%') {
-            pad_op = newOP(OP_PADHV, (OPpLVAL_INTRO<<8)|OPf_WANT_LIST);
+            pad_op = newOP(OP_PADHV, 0);
             name = parse_hash_varname();
             pad_op->op_targ = pad_add_my_hash_sv(name);
         }
@@ -228,7 +226,8 @@ static OP *THX_parse_function_prototype(pTHX)
         }
     }
 
-    myvars->op_flags |= OPf_PARENS;
+    myvars = Perl_localize(aTHX_ myvars, 1);
+    myvars = Perl_sawparens(aTHX_ myvars);
 
     get_args = newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, gv_fetchpv("_", 0, SVt_PVAV)));
     arg_assign = newASSIGNOP(OPf_STACKED, myvars, 0, get_args);
