@@ -29,4 +29,9 @@ is(sum(1, 2, 3, 4), 10);
 
 ok(exists $Foo::{foo});
 
+fun empty ($bar, $baz) { }
+
+is(scalar(empty(1, 2)), undef);
+is_deeply([empty(1, 2)], []);
+
 done_testing;
