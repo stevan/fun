@@ -29,7 +29,8 @@ that C<sub> does, except allowing for function signatures. These signatures
 support defaults and slurpy arguments, but no other advanced features. The
 behavior should be equivalent to taking the signature, stripping out the
 defaults, and injecting C<< my <sig> = @_ >> at the start of the function, and
-then applying defaults as appropriate.
+then applying defaults as appropriate, except that the arguments are made
+readonly.
 
 =cut
 
