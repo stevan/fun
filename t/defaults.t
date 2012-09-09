@@ -45,4 +45,13 @@ fun baz ($a, $b = our $FOO) {
 our $FOO = "abc";
 is(baz("123"), "123 abc");
 
+fun goorch ($x, $y = []) {
+    return $y
+}
+
+my $goorch_y_1 = goorch( 10 );
+my $goorch_y_2 = goorch( 10 );
+
+isnt($goorch_y_1, $goorch_y_2, '... not the same reference');
+
 done_testing;
